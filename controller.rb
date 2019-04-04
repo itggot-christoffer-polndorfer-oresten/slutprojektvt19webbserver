@@ -1,29 +1,39 @@
 require'sqlite3'
+require'slim'
+require'sinatra'
 require'byebug'
 require'BCrypt'
+require_relative "modell.rb"
+enable :sessions
 
-
-def open_link_to_db
-    db = SQLite3::Database.new("Database/database.db")
-    db.results_as_hash = true
-    return db
+get('/') do 
+    slim(:login)
 end 
 
-def reg_password_verification(password)
-    db = SQLite3::Database.new("Database/database.db")
-    db.results_as_hash = true
-    reg_pw = db.execute("SELECT RegisterPassword FROM secrets")
-    byebug
-    if password == reg_pw
-        return true 
+post('/login') do 
+    if login_verification(params["Username"], params["Password"]) == true
+        # session[:name] = database_info[0]["Username"]
+        # session[:id] = database_info[0]["UserId"]
+        # session[:loggedin?] = true
+        # verification = true 
+        redirect('/vault')
+    else 
+        redirect('/')
     end 
 end 
 
-# def login_verification(params)
-#     db = open_link_to_db()
-#     lol = db.execute("SELECT UserId FROM users WHERE UserPassword =? ", params)
-#     return lol
-# end 
+get('/create_vault') do 
+    slim(:create_vault)
+end 
 
-# BCrypt::Password.create(params["password"])
+post('/creating_vault') do 
+    db = connect_to_database()
+    # Kryptera lösen & lägg till i databas
+    encrypt_password(params["Username"], params["Password"])
+    session[:name] = params["Username"]
+    redirect('/vault')
+end 
 
+get('/vault') do 
+    slim(:vault)
+end 
