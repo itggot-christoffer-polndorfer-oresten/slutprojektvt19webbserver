@@ -1,6 +1,8 @@
-form action="/login" method="POST"
-    input type="text" name="Username" required="required" placeholder="Enter Username"
-    input type="password" name="Password" required="required" placeholder="Enter Password"
-    input type="submit" value=" Login"
+.login_wrapper
+    .login
+        form class="login_fields" action="/login" method="POST"
+            input type="text" name="Username" required="required" placeholder="Enter Username"
+            input type="password" name="Password" required="required" placeholder="Enter Password"
+            input type="submit" value=" Login"
 
-a.create_account href="/create_vault" Create Account
+        a.create_account class="Creat_acc_button" href="/create_vault" Create Account

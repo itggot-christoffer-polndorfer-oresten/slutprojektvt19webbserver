@@ -12,10 +12,8 @@ end
 
 post('/login') do 
     if login_verification(params["Username"], params["Password"]) == true
-        # session[:name] = database_info[0]["Username"]
-        # session[:id] = database_info[0]["UserId"]
-        # session[:loggedin?] = true
-        # verification = true 
+        session[:id] = select_session_id(params["Username"])
+        session[:logged_in?] = true
         redirect('/vault')
     else 
         redirect('/')
@@ -35,5 +33,27 @@ post('/creating_vault') do
 end 
 
 get('/vault') do 
-    slim(:vault)
+    if session[:logged_in?] == true 
+        slim(:vault)
+    else 
+        redirect('/')
+    end 
+end 
+
+post('/locking_vault') do 
+    session.destroy
+    redirect('/')
+end 
+
+get('/upload_meme') do 
+    if session[:logged_in?] == true 
+        slim(:upload_meme)
+    else
+        redirect('/')
+    end 
+end 
+
+post('/uploading_meme') do 
+    upload_meme(params[:img][:tempfile], imgname = params[:img][:filename], session[:id])
+    redirect('/vault')
 end 
