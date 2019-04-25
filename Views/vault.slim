@@ -3,4 +3,16 @@ div.vault_wrapper
         form action="/locking_vault" method="POST"
             input type="submit" value="Lock vault!"
         a href="/upload_meme" Uppload memes
+    .gallery_wrapper
+        -meme.each do |element|
+            -if sessionid = element["AutherId"]
+                - byebug
+                form action="delete_meme/#{element["MemeId"]}" method="POST"
+                    input type="Submit" 
+                        i.material-icons delete
+
+               
+            article.memes
+                div.post
+                    / img src="/img/#{element["MemeImgPath"]}"
 

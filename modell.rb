@@ -9,6 +9,11 @@ def connect_to_database
     return db
 end 
 
+def memes()
+    db = connect_to_database()
+    return db.execute("SELECT * FROM memes ORDER BY MemeId DESC")
+end 
+
 
 def encrypt_password(username, password)
     db = connect_to_database()
@@ -28,18 +33,19 @@ end
 
 def select_session_id(params_username)
     db = connect_to_database()
+    db.results_as_hash = true
     return db.execute("SELECT UserId FROM users WHERE users.Username = ?", params_username)
 end 
 
-def upload_meme(img, imgname, autherid)
+def upload_meme(img, imgname, autherid, memetag1, memetag2, memetag3)
     db = connect_to_database()
-    if imgname.include?(".png") or imgname.include?(".jpg")
+    if imgname.include?(".png") or imgname.include?(".jpg") or imgname.include?(".jpeg")
         newname = SecureRandom.hex(10) + "." + /(.*)\.(jpg|bmp|png|jpeg)$/.match(imgname)[2]
         File.open("public/img/#{newname}", 'wb') do |f|
             f.write(img.read)
         end
     end 
-    db.execute("INSERT INTO memes (MemeImgPath, MemeAutherId) VALUES (?,?)", newname, autherid.first["UserId"])
+    db.execute("INSERT INTO memes (MemeImgPath, MemeAutherId, MemeTag1, MemeTag2, MemeTag3) VALUES (?,?,?,?,?)", newname, autherid.first["UserId"], memetag1, memetag2, memetag3 )
 
 
 end 
