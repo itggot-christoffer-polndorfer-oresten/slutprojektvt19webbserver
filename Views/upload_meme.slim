@@ -1,41 +1,27 @@
 form action="uploading_meme" method="POST" enctype="multipart/form-data"
-    input type="file" name="img" accept="image/*" required="required" onchange="loadFile(event)"
+    input type="file" name="img" accept="image/*" required="required"
+
     p Select first tag
     select name="MemeTag1" 
-        option value="Dark" Dark
-        option value="Cat" Cat
-        option value="Reaction" Reaction
-        option value="Thanos" Thanos
-        option value="Rage Comics" Rage Comics
-        option value="History" History
-        option value="Deep Fried" Deep Fried 
-        option value="Engineering" Engineering
+        -tags.each do |element|
+            option value="#{element["Id"]}"= element["Tag"]
+
     p Select second tag
     select name="MemeTag2"
-        option value="Dark" Dark
-        option value="Cat" Cat
-        option value="Reaction" Reaction
-        option value="Thanos" Thanos
-        option value="Rage Comics" Rage Comics
-        option value="History" History
-        option value="Deep Fried" Deep Fried 
-        option value="Engineering" Engineering
+        -tags.each do |element|
+            option value="#{element["Id"]}"= element["Tag"]
+
     p Select third tag
-    select name="MemeTag3"
-        option value="Dark" Dark
-        option value="Cat" Cat
-        option value="Reaction" Reaction
-        option value="Thanos" Thanos
-        option value="Rage Comics" Rage Comics
-        option value="History" History
-        option value="Deep Fried" Deep Fried 
-        option value="Engineering" Engineering
+    select name="MemeTag3" 
+        -tags.each do |element|
+            option value="#{element["Id"]}"= element["Tag"]
+    
     p
     
-    input type="submit" value="Uppload!"
+    input type="submit" value="Upload!"
 
 
-/ img id="output"
+img id="output"
 
 / script
 /     var loadFile = function(event)

@@ -3,16 +3,18 @@ div.vault_wrapper
         form action="/locking_vault" method="POST"
             input type="submit" value="Lock vault!"
         a href="/upload_meme" Uppload memes
+    .search_bar 
+        form action="/searching" method="POST"
+            input type="text" name="Search" placeholder="Search..."
+            button type="submit"
+                i.material-icons search
     .gallery_wrapper
         -meme.each do |element|
-            -if sessionid = element["AutherId"]
-                - byebug
-                form action="delete_meme/#{element["MemeId"]}" method="POST"
-                    input type="Submit" 
+            -if sessionid == element["MemeAutherId"].to_i
+                form action="delete_meme/#{element["MemeId"]}" method="POST" class="Delete_Button"
+                    input type="Submit" value="Delete"
                         i.material-icons delete
-
-               
             article.memes
                 div.post
-                    / img src="/img/#{element["MemeImgPath"]}"
+                    img src="/img/#{element["MemeImgPath"]}"
 

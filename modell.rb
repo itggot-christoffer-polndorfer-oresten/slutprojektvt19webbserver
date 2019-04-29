@@ -33,8 +33,17 @@ end
 
 def select_session_id(params_username)
     db = connect_to_database()
-    db.results_as_hash = true
     return db.execute("SELECT UserId FROM users WHERE users.Username = ?", params_username)
+end 
+
+def get_tags()
+    db = connect_to_database()
+    return db.execute("SELECT * FROM tags")
+end
+
+def get_tag_by_id(id)
+    db = connect_to_database()
+    return db.execute("SELECT Tag FROM tags WHERE Id =?", id)
 end 
 
 def upload_meme(img, imgname, autherid, memetag1, memetag2, memetag3)
@@ -45,7 +54,36 @@ def upload_meme(img, imgname, autherid, memetag1, memetag2, memetag3)
             f.write(img.read)
         end
     end 
-    db.execute("INSERT INTO memes (MemeImgPath, MemeAutherId, MemeTag1, MemeTag2, MemeTag3) VALUES (?,?,?,?,?)", newname, autherid.first["UserId"], memetag1, memetag2, memetag3 )
+    db.execute("INSERT INTO memes (MemeImgPath, MemeAutherId, MemeTag1, MemeTag2, MemeTag3) VALUES (?,?,?,?,?)", newname, autherid, memetag1, memetag2, memetag3)
+end 
+
+def delete_meme(memeid)
+    db = connect_to_database()
+    db.execute("DELETE FROM memes WHERE MemeId = ?", memeid)
+
+end
+
+
+def search(search_input)
+    tags = get_tags()
+    tags.each_with_index do |element, i|
+        if search_input == tags[i]["Tag"]
+            byebug
+            return true
+        else
+            return nil
+        end 
+    end 
+
+
+
+end 
+
+
+def get_tagged_memes(tag)
+    db = connect_to_database()
+    tag_id = db.execute("SELECT Id FROM tags WHERE Tag = ?", tag)
+    db.execute("SELECT * FROM memes WHERE ")
 
 
 end 

@@ -3,7 +3,7 @@ require'slim'
 require'sinatra'
 require'byebug'
 require'BCrypt'
-require_relative "modell.rb"
+require_relative 'modell.rb'
 enable :sessions
 
 get('/') do 
@@ -49,7 +49,8 @@ end
 
 get('/upload_meme') do 
     if session[:logged_in?] == true 
-        slim(:upload_meme)
+        tags = get_tags()
+        slim(:upload_meme, locals:{tags: tags})
     else
         redirect('/')
     end 
@@ -65,4 +66,21 @@ post('/uploading_meme') do
     
     upload_meme(img, imgname, autherid, memetag1, memetag2, memetag3)
     redirect('/vault')
+end 
+
+post('/delete_meme/:memeid') do
+    delete_meme(params["memeid"])
+    redirect('/vault')
+
+end 
+
+post('/searching') do   
+    search_input = params
+    if search(search_input) != nil
+        get_tagged_memes(search_input)
+
+    else 
+        # redirecta till error sidan ¨
+    end 
+
 end 
