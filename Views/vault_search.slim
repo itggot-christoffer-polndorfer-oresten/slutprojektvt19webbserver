@@ -1,0 +1,10 @@
+a href="/vault" I want to go back!
+.gallery_wrapper
+        -tagged_memes.each do |element|
+            -if sessionid == element["MemeAutherId"].to_i
+                form action="delete_meme/#{element["MemeId"]}" method="POST" class="Delete_Button"
+                    input type="Submit" value="Delete"
+                        i.material-icons delete
+            article.memes
+                div.post
+                    img src="/img/#{element["MemeImgPath"]}"

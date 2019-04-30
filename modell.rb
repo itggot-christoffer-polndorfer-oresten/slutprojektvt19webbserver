@@ -41,11 +41,6 @@ def get_tags()
     return db.execute("SELECT * FROM tags")
 end
 
-def get_tag_by_id(id)
-    db = connect_to_database()
-    return db.execute("SELECT Tag FROM tags WHERE Id =?", id)
-end 
-
 def upload_meme(img, imgname, autherid, memetag1, memetag2, memetag3)
     db = connect_to_database()
     if imgname.include?(".png") or imgname.include?(".jpg") or imgname.include?(".jpeg")
@@ -54,36 +49,43 @@ def upload_meme(img, imgname, autherid, memetag1, memetag2, memetag3)
             f.write(img.read)
         end
     end 
-    db.execute("INSERT INTO memes (MemeImgPath, MemeAutherId, MemeTag1, MemeTag2, MemeTag3) VALUES (?,?,?,?,?)", newname, autherid, memetag1, memetag2, memetag3)
+    db.execute("INSERT INTO memes (MemeImgPath, MemeAutherId) VALUES (?,?)", newname, autherid)
+    meme_id = db.last_insert_row_id
+    db.execute("INSERT INTO memes_tags (MemeId, TagId) VALUES (?, ?)", [meme_id, memetag1])
+    db.execute("INSERT INTO memes_tags (MemeId, TagId) VALUES (?, ?)", [meme_id, memetag2])
+    db.execute("INSERT INTO memes_tags (MemeId, TagId) VALUES (?, ?)", [meme_id, memetag3])
+end 
+
+def add_tag(new_tag)
+    db = connect_to_database()
+    
+    db.execute("INSERT INTO tags (Tag) VALUES (?)", new_tag.downcase)
+end 
+
+def check_tag(new_tag)
+    db = connect_to_database()
+    if db.execute("SELECT * FROM tags WHERE Tag = ?", new_tag.downcase) != []
+        return false 
+    else 
+        return true 
+    end 
 end 
 
 def delete_meme(memeid)
     db = connect_to_database()
     db.execute("DELETE FROM memes WHERE MemeId = ?", memeid)
-
 end
 
-
-def search(search_input)
-    tags = get_tags()
-    tags.each_with_index do |element, i|
-        if search_input == tags[i]["Tag"]
-            byebug
-            return true
-        else
-            return nil
-        end 
-    end 
-
-
-
-end 
-
-
-def get_tagged_memes(tag)
+def search(searched_tag)
     db = connect_to_database()
-    tag_id = db.execute("SELECT Id FROM tags WHERE Tag = ?", tag)
-    db.execute("SELECT * FROM memes WHERE ")
-
-
+    db.results_as_hash = true
+    tagged_memes_info = []
+    tag_id = db.execute("SELECT Id FROM tags WHERE Tag =?", searched_tag["Search"].downcase) 
+    return db.execute("SELECT * FROM memes INNER JOIN memes_tags ON memes_tags.MemeId = memes.MemeId WHERE TagId =? ORDER BY MemeId DESC", tag_id.first["Id"]) 
 end 
+
+def img_path_retriever(tagged_memes)
+    db = connect_to_database()
+    img_paths = db.execute("SELECT MemeImgPath FROM memes WHERE MemeId = ?", )
+end 
+

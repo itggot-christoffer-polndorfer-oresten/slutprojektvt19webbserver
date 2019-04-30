@@ -1,10 +1,13 @@
 require'sqlite3'
 require'slim'
 require'sinatra'
+require 'sinatra/flash'
 require'byebug'
 require'BCrypt'
+require 'rack-flash'
 require_relative 'modell.rb'
 enable :sessions
+
 
 get('/') do 
     slim(:login)
@@ -56,6 +59,22 @@ get('/upload_meme') do
     end 
 end 
 
+post('/add_tag') do 
+    if params["new_tag"].length > 0
+        if check_tag(params["new_tag"]) != false
+            add_tag(params["new_tag"])
+            redirect('/upload_meme')
+        else 
+            flash[:notice] = "Tag already exists!"
+            redirect back
+        end 
+    else 
+        
+        flash[:warning] = "ENTER A TAG!"
+        redirect back
+    end 
+end 
+
 post('/uploading_meme') do 
     img = params[:img][:tempfile]
     imgname = params[:img][:filename]
@@ -75,12 +94,21 @@ post('/delete_meme/:memeid') do
 end 
 
 post('/searching') do   
-    search_input = params
-    if search(search_input) != nil
-        get_tagged_memes(search_input)
-
+    searched_tag = params
+    if searched_tag != nil
+        $tagged_memes = search(searched_tag)
+        redirect('/vault_search')
+        # session[:tagged_memes] = tagged_memes
     else 
-        # redirecta till error sidan ¨
+        # redirecta till error sidan
     end 
+end 
 
+get('/vault_search') do 
+    if session[:logged_in?] == true
+        sessionid = session[:id] 
+        slim(:vault_search, locals:{tagged_memes: $tagged_memes, sessionid: sessionid})
+    else
+        redirect('/')
+    end       
 end 
