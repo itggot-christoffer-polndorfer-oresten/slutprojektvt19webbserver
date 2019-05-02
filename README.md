@@ -22,9 +22,9 @@ se ./Diagrams/Sekvens
 ## 4. Arkitektur (Beskriv filer och mappar)
 -Database
 --database.db
--Diagram
---Sekvens
---ER
+-Diagrams
+--Sekvense
+--Er-diagram
 -Public
 --css
 ---vault.css
@@ -38,7 +38,6 @@ se ./Diagrams/Sekvens
 --upload_meme.slim
 --vault_search.slim
 --vault.slim
--.byebug_history
 -controller.rb
 -modell.rb
 -README.md
