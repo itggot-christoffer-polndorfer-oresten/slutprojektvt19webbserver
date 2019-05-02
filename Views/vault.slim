@@ -8,9 +8,13 @@ div.vault_wrapper
             input type="text" name="Search" placeholder="Search..."
             button type="submit"
                 i.material-icons search
+        -if flash[:warning] 
+            =flash[:warning]
+        -if flash[:notice]
+            =flash[:notice]
     .gallery_wrapper
         -meme.each do |element|
-            -if sessionid == element["MemeAutherId"].to_i
+            -if sessionid == element["MemeAutherId"].to_i or sessionid == 1
                 form action="delete_meme/#{element["MemeId"]}" method="POST" class="Delete_Button"
                     input type="Submit" value="Delete"
                         i.material-icons delete

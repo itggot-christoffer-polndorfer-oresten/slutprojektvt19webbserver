@@ -19,6 +19,8 @@ post('/login') do
         session[:logged_in?] = true
         redirect('/vault')
     else 
+        flash[:error] = "Wrong usernamer or password!"
+            redirect back
         redirect('/')
     end 
 end 
@@ -61,15 +63,14 @@ end
 
 post('/add_tag') do 
     if params["new_tag"].length > 0
-        if check_tag(params["new_tag"]) != false
+        if check_tag(params["new_tag"]) != true
             add_tag(params["new_tag"])
             redirect('/upload_meme')
         else 
             flash[:notice] = "Tag already exists!"
             redirect back
         end 
-    else 
-        
+    else  
         flash[:warning] = "ENTER A TAG!"
         redirect back
     end 
@@ -94,13 +95,18 @@ post('/delete_meme/:memeid') do
 end 
 
 post('/searching') do   
-    searched_tag = params
-    if searched_tag != nil
-        $tagged_memes = search(searched_tag)
-        redirect('/vault_search')
-        # session[:tagged_memes] = tagged_memes
+    searched_tag = params["Search"]
+    if searched_tag.length != 0
+        if check_tag(searched_tag) == true
+            $tagged_memes = search(searched_tag)
+            redirect('/vault_search')
+        else 
+            flash[:notice] = "No such tag!"
+            redirect('/vault')
+        end 
     else 
-        # redirecta till error sidan
+        flash[:warning] = "PLEASE ENTER A TAG!"
+        redirect('/vault')
     end 
 end 
 

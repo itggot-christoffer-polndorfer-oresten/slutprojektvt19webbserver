@@ -4,5 +4,9 @@
             input type="text" name="Username" required="required" placeholder="Enter Username"
             input type="password" name="Password" required="required" placeholder="Enter Password"
             input type="submit" value=" Login"
-
+        
+        -if flash[:error] 
+            =flash[:error]
+    p
         a.create_account class="Creat_acc_button" href="/create_vault" Create Account
+

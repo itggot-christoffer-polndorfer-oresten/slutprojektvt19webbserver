@@ -63,11 +63,12 @@ def add_tag(new_tag)
 end 
 
 def check_tag(new_tag)
+    
     db = connect_to_database()
     if db.execute("SELECT * FROM tags WHERE Tag = ?", new_tag.downcase) != []
-        return false 
-    else 
         return true 
+    else 
+        return false 
     end 
 end 
 
@@ -79,8 +80,8 @@ end
 def search(searched_tag)
     db = connect_to_database()
     db.results_as_hash = true
-    tagged_memes_info = []
-    tag_id = db.execute("SELECT Id FROM tags WHERE Tag =?", searched_tag["Search"].downcase) 
+    
+    tag_id = db.execute("SELECT Id FROM tags WHERE Tag =?", searched_tag.downcase) 
     return db.execute("SELECT * FROM memes INNER JOIN memes_tags ON memes_tags.MemeId = memes.MemeId WHERE TagId =? ORDER BY MemeId DESC", tag_id.first["Id"]) 
 end 
 
