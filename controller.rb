@@ -61,6 +61,7 @@ end
 get('/vault') do 
     if session[:logged_in?] == true 
         meme = memes()
+        byebug
         sessionid = session[:id]
         slim(:vault, locals:{meme: meme, sessionid: sessionid})
     else 
