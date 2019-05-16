@@ -6,11 +6,12 @@ require'byebug'
 require'BCrypt'
 require 'rack-flash'
 require_relative 'modell.rb'
+# require'sinatra/param'
 enable :sessions
 include Meme_vault 
 
 
-# Display Landing Page and a login form
+# Displays Landing Page and a login form
 #
 get('/') do 
     slim(:login)
@@ -41,18 +42,35 @@ get('/create_vault') do
     slim(:create_vault)
 end 
 
-# Creates a new vault and redirects to '/vault'
+# Attempts to create a new vault and redirects to '/vault'
 #
-# @param [String] username, The vaults user
-# @param [String] password, The users password
+# @param [Hash]
+#   * :Username [String] The username of the vault
+#   * :Password [String] The password of the vault
+#   * :Confirmed_passwpord [String] The confirmed password
 # 
 # @see Meme_vault#connect_to_db
 # @see Meme_vault#encrypt_password
 post('/creating_vault') do 
-    db = connect_to_database()
-    encrypt_password(params["Username"], params["Password"])
-    session[:name] = params["Username"]
-    redirect('/vault')
+    if creating_vault_validation_length(params) == true
+        if creating_vault_validation_spaces(params) == true
+            if matching_passwords(params) == true
+                db = connect_to_database()
+                encrypt_password(params["Username"], params["Password"])
+                session[:name] = params["Username"]
+                redirect('/vault')
+            else
+                flash[:incorrect_passwords] = "Passwords does not match!"
+                redirect back
+            end 
+        else 
+            flash[:account_error] = "Please enter a username or password which does not only contain spaces!"
+            redirect back
+        end 
+    else 
+        flash[:account_warning] = "Please enter ALL information!"
+        redirect back
+    end 
 end 
 
 # Displays all memes
@@ -61,7 +79,6 @@ end
 get('/vault') do 
     if session[:logged_in?] == true 
         meme = memes()
-        byebug
         sessionid = session[:id]
         slim(:vault, locals:{meme: meme, sessionid: sessionid})
     else 
@@ -95,16 +112,22 @@ end
 # @see Meme_vault#check_tag
 # @see Meme_vault#add_tag
 post('/add_tag') do 
-    if params["new_tag"].length > 0
-        if check_tag(params["new_tag"]) != true
-            add_tag(params["new_tag"])
-            redirect('/upload_meme')
+    if params["new_tag"].length > 0 and 
+        # check_space = params["new_tag"] =~ /\A\s*\Z/
+        if params["new_tag"].strip.empty? == false
+            if check_tag(params["new_tag"]) != true
+                add_tag(params["new_tag"])
+                redirect('/upload_meme')
+            else 
+                flash[:notice] = "Tag already exists!"
+                redirect back
+            end 
         else 
-            flash[:notice] = "Tag already exists!"
+            flash[:no_text] = "Please enter a tag with letters!"
             redirect back
         end 
     else  
-        flash[:warning] = "ENTER A TAG!"
+        flash[:warning] = "Please enter a tag!"
         redirect back
     end 
 end 
@@ -125,8 +148,11 @@ post('/uploading_meme') do
     memetag1 = params[:MemeTag1]
     memetag2 =  params[:MemeTag2]
     memetag3 =  params[:MemeTag3]
-    
-    upload_meme(img, imgname, autherid, memetag1, memetag2, memetag3)
+
+    if upload_meme(img, imgname, autherid, memetag1, memetag2, memetag3) == false
+        flash[:error] = "Wrong arguments!"
+        redirect('/vault')
+    end 
     redirect('/vault')
 end 
 
@@ -136,9 +162,12 @@ end
 #
 # @see Meme_vault#delete_meme
 post('/delete_meme/:memeid') do
-    delete_meme(params["memeid"])
-    redirect('/vault')
-
+    if match_id(params["memeid"]) == session[:id]
+        delete_meme(params["memeid"])
+        redirect('/vault')
+    else 
+        redirect('/vault')
+    end
 end 
 
 # Displays search result based on paramaters
@@ -167,7 +196,7 @@ post('/searching') do
             redirect('/vault')
         end 
     else 
-        flash[:warning] = "PLEASE ENTER A TAG!"
+        flash[:warning] = "Please enter search tag!"
         redirect('/vault')
     end 
 end 

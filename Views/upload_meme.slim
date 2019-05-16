@@ -34,6 +34,11 @@ form action="add_tag" method="POST"
 -if flash[:warning] 
     =flash[:warning]
 
+-if flash[:error] 
+    =flash[:error]
+
+-if flash[:no_text]
+    =flash[:no_text]
 
 img id="output"
 

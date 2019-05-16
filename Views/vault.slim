@@ -16,6 +16,7 @@ div.vault_wrapper
         -meme.each do |element|
             -if sessionid == element["MemeAutherId"].to_i or sessionid == 1
                 form action="delete_meme/#{element["MemeId"]}" method="POST" class="Delete_Button"
+                
                     button type="submit" value="Delete"
                         i.material-icons delete
             article.memes

@@ -40,20 +40,24 @@ module Meme_vault
             File.open("public/img/#{newname}", 'wb') do |f|
                 f.write(img.read)
             end
+            db.execute("INSERT INTO memes (MemeImgPath, MemeAutherId) VALUES (?,?)", newname, autherid)
+            meme_id = db.last_insert_row_id
+            db.execute("INSERT INTO memes_tags (MemeId, TagId) VALUES (?, ?)", [meme_id, memetag1])
+            db.execute("INSERT INTO memes_tags (MemeId, TagId) VALUES (?, ?)", [meme_id, memetag2])
+            db.execute("INSERT INTO memes_tags (MemeId, TagId) VALUES (?, ?)", [meme_id, memetag3])
+            return true
+        else 
+            return false 
         end 
-        db.execute("INSERT INTO memes (MemeImgPath, MemeAutherId) VALUES (?,?)", newname, autherid)
-        meme_id = db.last_insert_row_id
-        db.execute("INSERT INTO memes_tags (MemeId, TagId) VALUES (?, ?)", [meme_id, memetag1])
-        db.execute("INSERT INTO memes_tags (MemeId, TagId) VALUES (?, ?)", [meme_id, memetag2])
-        db.execute("INSERT INTO memes_tags (MemeId, TagId) VALUES (?, ?)", [meme_id, memetag3])
     end 
 
     # Attempts to delete a row in the memes table
     #
     # @param [Integer] memeid, The id of the meme
-    def delete_meme(memeid)
+    def delete_meme(memeid) 
         db = connect_to_database()
-        db.execute("DELETE FROM memes WHERE MemeId = ?", memeid)
+        db.execute("DELETE FROM memes WHERE MemeId = ?", memeid) 
+        
     end
 
     # Selects ALL from the tags table
@@ -138,6 +142,67 @@ module Meme_vault
         db.results_as_hash = true
         tag_id = db.execute("SELECT Id FROM tags WHERE Tag =?", searched_tag.downcase) 
         return db.execute("SELECT * FROM memes INNER JOIN memes_tags ON memes_tags.MemeId = memes.MemeId WHERE TagId =? ORDER BY MemeId DESC", tag_id.first["Id"]) 
+    end 
+
+    # Selects the auther id from the meme id 
+    #
+    # @param [Integer] memeid, The meme ID
+    #
+    # @return [Integer] The auther ID of the meme
+    def match_id(memeid)
+        db = connect_to_database()
+        return db.execute("SELECT MemeAutherId FROM memes WHERE MemeId = ?", memeid).first["MemeAutherId"]
+    end 
+
+    # Checks if both passwords match
+    #
+    # @param [Hash]
+    #   * :Username [String] The username of the vault
+    #   * :Password [String] The password of the vault
+    #   * :Confirmed_passwpord [String] The confirmed password
+    #
+    # @return [True] if passwords match
+    # @retun [False] if passwords doesn't match
+    def matching_passwords(params)
+        if params["Passwprd"] == params["Confirmed_password"]
+            return true 
+        else 
+            return false
+        end 
+    end 
+
+    # Checks if the create vault forms are empty
+    #
+    # @param [Hash]
+    #   * :Username [String] The username of the vault
+    #   * :Password [String] The password of the vault
+    #   * :Confirmed_passwpord [String] The confirmed password
+    #
+    # @return [True] if both inputs are correct
+    # @retun [False] if one or more inputs are empty
+    def creating_vault_validation_length(params)
+        if params["Username"].length > 0 and params["Password"].length > 0
+            return true
+        else 
+            return false
+        end 
+    end 
+
+    # Checks if inputs only contain spaces
+    #
+    # @param [Hash]
+    #   * :Username [String] The username of the vault
+    #   * :Password [String] THe password of the vault
+    #   * :Confirmed_passwpord [String] The confirmed password
+    #
+    # @return [True] if both inputs are correct
+    # @retun [False] if one or more inputs only contains spaces
+    def creating_vault_validation_spaces(params)
+        if params["Username"].strip.empty? != true and params["Password"].strip.empty? != true
+            return true 
+        else 
+            return false
+        end 
     end 
 
 end 
