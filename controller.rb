@@ -181,6 +181,20 @@ get('/vault_search') do
     end       
 end 
 
+# Displays a form for updating vault credentials
+#
+get('/edit_vault') do 
+    if session[:logged_in?] == true
+        slim(:edit_vault)
+    end 
+end 
+
+
+post('/edeting_vault') do 
+    update_vault_credentials(params, session[:id])
+    
+
+end 
 # Retrieves tagged memes and redirects to '/vault_search'
 #
 # @see Meme_vault#check_tag

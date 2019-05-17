@@ -205,4 +205,35 @@ module Meme_vault
         end 
     end 
 
+
+    def update_vault_credentials(params, session_id)
+        db = connect_to_database()
+        old_password =  BCrypt::Password.new(db.execute("SELECT Password FROM users WHERE UserId = ?", session_id))
+        
+        if params["new_username"] != nil and params["confirmed_new_username"] !=nil and params["new_username"] == params["confirmed_new_username"]
+            db.execute("UPDATE users")
+        else 
+
+        
+        end 
+        
+        # if params["new_username"] != nil and params["confirmed_new_username"] != nil
+        #     if 
+        # end 
+        # if old_password == params["old_password"]
+        #     if params["new_username"]
+        #         if params["new_username"].strip.empty? == false 
+                    
+        #         end 
+        #     end 
+
+        else 
+
+        p params
+        byebug
+        
+
+       
+
+    end 
 end 

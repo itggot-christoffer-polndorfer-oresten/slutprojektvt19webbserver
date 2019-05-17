@@ -2,7 +2,15 @@ div.vault_wrapper
     div.vault_header
         form action="/locking_vault" method="POST"
             input type="submit" value="Lock vault!"
-        a href="/upload_meme" Uppload memes
+        p
+        form action="/edit_vault"
+            input type="submit" value="Edit vault information"
+
+        p
+        form action="/upload_meme"
+            input type="submit" value="Upload meme"
+
+        p
     .search_bar 
         form action="/searching" method="POST"
             input type="text" name="Search" placeholder="Search..."
@@ -16,7 +24,7 @@ div.vault_wrapper
         -meme.each do |element|
             -if sessionid == element["MemeAutherId"].to_i or sessionid == 1
                 form action="delete_meme/#{element["MemeId"]}" method="POST" class="Delete_Button"
-                
+
                     button type="submit" value="Delete"
                         i.material-icons delete
             article.memes
