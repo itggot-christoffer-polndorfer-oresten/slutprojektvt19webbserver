@@ -60,7 +60,7 @@ post('/creating_vault') do
                 session[:name] = params["Username"]
                 redirect('/vault')
             else
-                flash[:incorrect_passwords] = "Passwords does not match!"
+                flash[:incorrect_passwords] = "Passwords do not match!"
                 redirect back
             end 
         else 
@@ -189,12 +189,20 @@ get('/edit_vault') do
     end 
 end 
 
-
+# Attempts to update the vault credentials
+#
+# @param [String] update_error, the error message if an error occurs
+#
+# @see Meme_vault#update_vault_credentials
 post('/edeting_vault') do 
-    update_vault_credentials(params, session[:id])
-    
-
+    update_error = update_vault_credentials(params, session[:id])
+    if update_error != true 
+        flash[:update_error] = update_error
+        redirect back
+    end 
+    redirect('/vault')
 end 
+
 # Retrieves tagged memes and redirects to '/vault_search'
 #
 # @see Meme_vault#check_tag

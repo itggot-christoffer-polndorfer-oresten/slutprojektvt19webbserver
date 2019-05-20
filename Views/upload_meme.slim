@@ -1,3 +1,7 @@
+form action="/vault"
+    input type="submit" value="Take me back!"
+p 
+
 form action="uploading_meme" method="POST" enctype="multipart/form-data"
     input type="file" name="img" accept="image/*" required="required"
 
@@ -40,6 +44,6 @@ form action="add_tag" method="POST"
 -if flash[:no_text]
     =flash[:no_text]
 
-img id="output"
+
 
  

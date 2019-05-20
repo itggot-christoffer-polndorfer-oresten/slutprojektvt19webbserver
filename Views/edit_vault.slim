@@ -1,10 +1,19 @@
+form action="/vault"
+    input type="submit" value="Take me back!"
+p 
 form action=("/edeting_vault") method=("POST")
     input type="text" name="new_username" placeholder="New Username"
     input type="text" name="confirmed_new_username" placeholder="Confirm New Username"
-    input type="password" name="old_password" placeholder="Old Password" required="true"
     input type="password" name="new_password" placeholder="New Password"
     input type="password" name="confirmed_new_password" placeholder="Confirm new Password"
+    input type="password" name="old_password" placeholder="Old Password" required="true"
     input type="submit" value="Update your Vault Credentials!"
 
-p If you only want to change passwords, please leave username fields blank
+
+
+-if flash[:update_error]
+    =flash[:update_error]
+
+
+p If you only want to change your password, please leave username fields blank
 p If you only want to change your username, please leave new password fields blank, but enter your old password. 

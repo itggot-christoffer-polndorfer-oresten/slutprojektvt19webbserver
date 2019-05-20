@@ -90,6 +90,20 @@ module Meme_vault
             return false 
         end 
     end 
+    # Searches for usernam and checks if username alreadye exists
+    #
+    # @param [String] new_username, The new username
+    #
+    # @return [true] if username exists
+    # @return [false] if username doesn't exist
+    def check_name(new_username)
+        db = connect_to_database()
+        if db.execute("SELECT * FROM users WHERE Username =?", new_username) != []
+            return true
+        else 
+            return false
+        end 
+    end 
     
     # Encrypts and attempts to insert a row into the users table
     # 
@@ -164,7 +178,7 @@ module Meme_vault
     # @return [True] if passwords match
     # @retun [False] if passwords doesn't match
     def matching_passwords(params)
-        if params["Passwprd"] == params["Confirmed_password"]
+        if params["Password"] == params["Confirmed_password"]
             return true 
         else 
             return false
@@ -190,7 +204,7 @@ module Meme_vault
 
     # Checks if inputs only contain spaces
     #
-    # @param [Hash]
+    # @param [Hash] params
     #   * :Username [String] The username of the vault
     #   * :Password [String] THe password of the vault
     #   * :Confirmed_passwpord [String] The confirmed password
@@ -205,35 +219,44 @@ module Meme_vault
         end 
     end 
 
-
+    # Validates input data and attempts to update vault credentials
+    #
+    # @param [Hash] params
+    #   * :new_username [String] The new username
+    #   * :confirmed_new_username [String] The confirmation of the new username
+    #   * :new_password [String] The new password
+    #   * :confirmed_new_password [String] The confirmation of the new username
+    #   * :old_password [String] The old password
+    #
+    # @return [True] if all credentials match
+    # @return [String] an error message with the matching error
     def update_vault_credentials(params, session_id)
         db = connect_to_database()
-        old_password =  BCrypt::Password.new(db.execute("SELECT Password FROM users WHERE UserId = ?", session_id))
-        
-        if params["new_username"] != nil and params["confirmed_new_username"] !=nil and params["new_username"] == params["confirmed_new_username"]
-            db.execute("UPDATE users")
-        else 
-
-        
-        end 
-        
-        # if params["new_username"] != nil and params["confirmed_new_username"] != nil
-        #     if 
-        # end 
-        # if old_password == params["old_password"]
-        #     if params["new_username"]
-        #         if params["new_username"].strip.empty? == false 
-                    
-        #         end 
-        #     end 
-
-        else 
-
-        p params
+        db_old_password = db.execute("SELECT Password FROM users WHERE UserId = ?", session_id).first
         byebug
-        
-
-       
-
+        if BCrypt::Password.new(db_old_password["Password"]) == params["old_password"]
+            if params["new_username"].strip.length > 0 and params["new_username"] == params["confirmed_new_username"]
+                if check_name(params["new_username"]) == true 
+                    return "Name already exists!"
+                else 
+                    db.execute("UPDATE users SET Username = ? WHERE UserId = ?", params["new_username"], session_id)
+                        if params["new_password"].strip.empty? != false and params["confirmed_new_password"].strip.empty? != false
+                            return true
+                        end 
+                end 
+            else 
+                return "Usernames do not match!"
+            end 
+            if params["new_password"].strip.length > 0 and params["new_password"] == params["confirmed_new_password"] 
+                encrypted_new_password = BCrypt::Password.create(params["new_password"])
+                db.execute("UPDATE users SET Password = ? WHERE UserId = ?", encrypted_new_password, session_id)
+                return true 
+            else 
+                return "Passwords do not match"
+            end 
+        else
+            return "Wrong password!"
+        end 
     end 
+
 end 
